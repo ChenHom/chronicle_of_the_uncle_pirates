@@ -53,10 +53,24 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
           GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
 
+      - name: List build output (debug)
+        run: |
+          echo "Checking build output..."
+          ls -la ./
+          if [ -d "./out" ]; then
+            echo "out directory found:"
+            ls -la ./out/
+          else
+            echo "out directory not found!"
+            echo "Available directories:"
+            find . -type d -name "*" -maxdepth 2
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
+        if: always() && hashFiles('./out/**/*')
 
   # 部署工作
   deploy:
