@@ -27,7 +27,9 @@ function getGoogleSheetsClient() {
   let privateKey = process.env.GOOGLE_PRIVATE_KEY!;
   
   if (!serviceAccountEmail || !privateKey) {
-    throw new Error('Missing Google Sheets credentials');
+    // 在建置時如果沒有認證，返回 null 而不是拋出錯誤
+    console.warn('⚠️  Google Sheets credentials not found - using mock data for build');
+    return null;
   }
 
   // Fix private key format
@@ -49,6 +51,11 @@ function getGoogleSheetsClient() {
 export async function getAlbums(): Promise<Album[]> {
   try {
     const sheets = getGoogleSheetsClient();
+    
+    // 如果沒有認證 (建置時)，返回空陣列
+    if (!sheets) {
+      return [];
+    }
     
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
@@ -74,6 +81,11 @@ export async function getAlbums(): Promise<Album[]> {
 export async function getTransactions(): Promise<Transaction[]> {
   try {
     const sheets = getGoogleSheetsClient();
+    
+    // 如果沒有認證 (建置時)，返回空陣列
+    if (!sheets) {
+      return [];
+    }
     
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
@@ -126,6 +138,12 @@ export async function getFinancialSummary() {
 export async function testSheetAccess() {
   try {
     const sheets = getGoogleSheetsClient();
+    
+    // 如果沒有認證 (建置時)，返回 null
+    if (!sheets) {
+      console.warn('⚠️  Cannot test sheet access - no credentials');
+      return null;
+    }
     
     console.log("--- Testing sheet access ---");
     const response = await sheets.spreadsheets.get({
