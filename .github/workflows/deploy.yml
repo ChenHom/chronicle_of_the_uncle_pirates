@@ -58,19 +58,32 @@ jobs:
           echo "Checking build output..."
           ls -la ./
           if [ -d "./out" ]; then
-            echo "out directory found:"
+            echo "✅ out directory found:"
             ls -la ./out/
+            echo "Files count: $(find ./out -type f | wc -l)"
           else
-            echo "out directory not found!"
+            echo "❌ out directory not found!"
             echo "Available directories:"
-            find . -type d -name "*" -maxdepth 2
+            find . -type d -name "*" -maxdepth 2 | head -10
+            echo "Checking if build failed..."
+            exit 1
+          fi
+
+      - name: Verify artifact content
+        run: |
+          if [ ! -f "./out/index.html" ]; then
+            echo "❌ index.html not found in out directory"
+            echo "Contents of out directory:"
+            ls -la ./out/
+            exit 1
+          else
+            echo "✅ index.html found"
           fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
-        if: always() && hashFiles('./out/**/*')
 
   # 部署工作
   deploy:

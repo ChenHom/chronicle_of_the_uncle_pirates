@@ -1,0 +1,80 @@
+name: Simple Deploy (Testing)
+
+on:
+  workflow_dispatch:
+
+# 設定權限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 確保只有一個部署在運行
+concurrency:
+  group: "pages-simple"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Next.js
+        run: |
+          echo "Starting build..."
+          npm run build
+          echo "Build completed"
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+
+      - name: Check build output
+        run: |
+          echo "=== Build Output Check ==="
+          ls -la ./
+          echo ""
+          if [ -d "./out" ]; then
+            echo "✅ out directory exists"
+            echo "Files in out directory:"
+            ls -la ./out/
+            echo ""
+            echo "Total files: $(find ./out -type f | wc -l)"
+            if [ -f "./out/index.html" ]; then
+              echo "✅ index.html exists"
+              head -5 ./out/index.html
+            else
+              echo "❌ index.html missing"
+            fi
+          else
+            echo "❌ out directory missing"
+            echo "Build may have failed"
+            exit 1
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

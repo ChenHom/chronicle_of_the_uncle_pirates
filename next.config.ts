@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   
-  // Set base path if deploying to a subdirectory (uncomment and modify if needed)
-  // basePath: '/chronicle_of_the_uncle_pirates',
+  // Set base path if deploying to a subdirectory (uncomment if repo is not at root domain)
+  basePath: process.env.NODE_ENV === 'production' ? '/chronicle_of_the_uncle_pirates' : '',
   
   // Trailing slash for better GitHub Pages compatibility
   trailingSlash: true,
