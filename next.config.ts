@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   // Enable static exports for GitHub Pages
   output: 'export',
   
-  // Specify output directory
-  distDir: 'out',
-  
   // Disable image optimization for static export
   images: {
     unoptimized: true,

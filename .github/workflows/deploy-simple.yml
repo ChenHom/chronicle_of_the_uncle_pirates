@@ -47,7 +47,11 @@ jobs:
       - name: Check build output
         run: |
           echo "=== Build Output Check ==="
+          echo "Root directory contents:"
           ls -la ./
+          echo ""
+          echo "Looking for next.config files:"
+          find . -name "next.config.*" -type f | head -5
           echo ""
           if [ -d "./out" ]; then
             echo "✅ out directory exists"
@@ -57,12 +61,16 @@ jobs:
             echo "Total files: $(find ./out -type f | wc -l)"
             if [ -f "./out/index.html" ]; then
               echo "✅ index.html exists"
+              echo "First few lines of index.html:"
               head -5 ./out/index.html
             else
               echo "❌ index.html missing"
+              exit 1
             fi
           else
             echo "❌ out directory missing"
+            echo "Available directories:"
+            find . -maxdepth 1 -type d | sort
             echo "Build may have failed"
             exit 1
           fi
