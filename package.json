@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "npm run build && gh workflow run deploy.yml",
+    "deploy:manual": "gh workflow run deploy.yml --ref master",
+    "deploy:status": "gh run list --workflow=deploy.yml --limit=5",
+    "deploy:watch": "gh run watch"
   },
   "dependencies": {
     "googleapis": "^155.0.1",
