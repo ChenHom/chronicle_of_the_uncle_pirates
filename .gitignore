@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# Ignore auto-generated next.config.js (we use next.config.ts)
+next.config.js
+
 # production
 /build
 

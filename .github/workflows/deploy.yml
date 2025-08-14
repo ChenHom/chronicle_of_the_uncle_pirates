@@ -40,6 +40,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Clean potential config conflicts
+        run: |
+          # Remove any auto-generated next.config.js to avoid conflicts with next.config.ts
+          if [ -f "next.config.js" ]; then
+            echo "Removing conflicting next.config.js file"
+            rm next.config.js
+          fi
+          echo "Using next.config.ts for configuration"
+          ls -la next.config.*
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
