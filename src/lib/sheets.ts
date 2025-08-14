@@ -13,6 +13,7 @@ export interface Album {
 export interface Transaction {
   TransactionID: string;
   Date: string;
+  Source: string; // Added 'Source' field
   Description: string;
   Type: '收入' | '支出';
   Amount: number;
@@ -89,7 +90,7 @@ export async function getTransactions(): Promise<Transaction[]> {
     
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: '收支明細!A2:H', // Skip header row, get all data - using same sheet for now
+      range: '收支明細!A2:I', // Skip header row, get all data - using same sheet for now
     });
 
     const rows = response.data.values || [];
@@ -97,12 +98,13 @@ export async function getTransactions(): Promise<Transaction[]> {
     return rows.map((row): Transaction => ({
       TransactionID: row[0] || '',
       Date: row[1] || '',
-      Description: row[2] || '',
-      Type: (row[3] as '收入' | '支出') || '支出',
-      Amount: parseFloat(row[4]) || 0,
-      Handler: row[5] || '',
-      ReceiptURL: row[6] || undefined,
-      Balance: parseFloat(row[7]) || 0,
+      Source: row[2] || '', // Added Source field
+      Description: row[3] || '',
+      Type: (row[4] as '收入' | '支出') || '支出',
+      Amount: parseFloat(row[5]) || 0,
+      Handler: row[6] || '',
+      ReceiptURL: row[7] || undefined,
+      Balance: parseFloat(row[8]) || 0,
     }));
   } catch (error) {
     console.error('Error fetching transactions:', error);

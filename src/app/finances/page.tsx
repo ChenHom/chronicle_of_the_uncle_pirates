@@ -83,8 +83,9 @@ export default async function FinancesPage() {
             <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md overflow-hidden">
               {/* 表格標題（桌面版） */}
               <div className="hidden md:block bg-gray-50 px-6 py-4 border-b">
-                <div className="grid grid-cols-7 gap-4 font-semibold text-gray-700">
+                <div className="grid grid-cols-8 gap-4 font-semibold text-gray-700">
                   <div>日期</div>
+                  <div>來源</div>
                   <div>項目說明</div>
                   <div>類型</div>
                   <div>金額</div>
@@ -100,9 +101,12 @@ export default async function FinancesPage() {
                   <div key={transaction.TransactionID || `transaction-${index}`} className="p-6 hover:bg-gray-50 transition-colors">
                     
                     {/* 桌面版佈局 */}
-                    <div className="hidden md:grid grid-cols-7 gap-4 items-center">
+                    <div className="hidden md:grid grid-cols-8 gap-4 items-center">
                       <div className="text-gray-600">
                         {new Date(transaction.Date).toLocaleDateString('zh-TW')}
+                      </div>
+                      <div className="text-gray-600">
+                        {transaction.Source}
                       </div>
                       <div className="font-medium text-gray-800">
                         {transaction.Description}
@@ -151,7 +155,7 @@ export default async function FinancesPage() {
                         <div>
                           <h4 className="font-medium text-gray-800">{transaction.Description}</h4>
                           <p className="text-sm text-gray-500">
-                            {new Date(transaction.Date).toLocaleDateString('zh-TW')} · {transaction.Handler}
+                            {new Date(transaction.Date).toLocaleDateString('zh-TW')} · {transaction.Source} · {transaction.Handler}
                           </p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
