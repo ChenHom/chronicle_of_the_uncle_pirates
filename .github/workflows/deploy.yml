@@ -52,6 +52,7 @@ jobs:
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
           GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          NODE_ENV: production
 
       - name: List build output (debug)
         run: |
@@ -65,6 +66,10 @@ jobs:
             echo "❌ out directory not found!"
             echo "Available directories:"
             find . -type d -name "*" -maxdepth 2 | head -10
+            echo "Checking .next directory:"
+            if [ -d "./.next" ]; then
+              ls -la ./.next/
+            fi
             echo "Checking if build failed..."
             exit 1
           fi
