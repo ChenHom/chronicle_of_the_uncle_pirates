@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
   
   // Trailing slash for better GitHub Pages compatibility
   trailingSlash: true,
+  
+  // Ensure output directory is 'out' (default for static export)
+  distDir: '.next',
 };
 
 export default nextConfig;
