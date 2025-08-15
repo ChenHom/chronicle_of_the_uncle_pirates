@@ -1,21 +1,15 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Enable static exports for GitHub Pages
-  output: 'export',
-  
-  // Disable image optimization for static export
+  // Disable image optimization for better compatibility
   images: {
     unoptimized: true,
   },
   
-  // Set base path if deploying to a subdirectory (uncomment if repo is not at root domain)
-  basePath: process.env.NODE_ENV === 'production' ? '/chronicle_of_the_uncle_pirates' : '',
-  
-  // Trailing slash for better GitHub Pages compatibility
+  // Trailing slash for better compatibility
   trailingSlash: true,
   
-  // Ensure output directory is 'out' (default for static export)
+  // Use default Next.js build directory
   distDir: '.next',
 };
 

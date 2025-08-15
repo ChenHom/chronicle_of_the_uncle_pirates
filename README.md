@@ -8,25 +8,50 @@
 - 📸 **活動相簿展示** - 精美的網格式相簿瀏覽
 - 💰 **透明財務管理** - 清晰的收支明細和統計資訊
 - 📱 **響應式設計** - 完美支援手機和桌面裝置
-- 🔄 **自動更新部署** - Google Sheets 一鍵更新網站
-- 🚀 **靜態網站** - 快速載入，GitHub Pages 免費託管
+- 🔄 **即時資料更新** - 與 Google Sheets 即時同步
+- 🚀 **現代化部署** - Vercel 自動部署，支援 SSR
 
 ## 🛠 技術架構
 
-- **前端框架**: Next.js 15 (React 18)
+- **前端框架**: Next.js 15 (React 19)
 - **樣式框架**: Tailwind CSS
-- **部署平台**: GitHub Pages
+- **部署平台**: Vercel (支援 SSR)
 - **資料來源**: Google Sheets
 - **API 整合**: Google Sheets API
-- **自動部署**: GitHub Actions + Google Apps Script
+- **自動部署**: Git Push 觸發自動部署
 
-## 📋 完整設定步驟
+## 🚀 快速部署指南
+
+### 🆕 推薦：Vercel 部署 (SSR + 即時資料)
+
+詳細步驟請參考：[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
+
+**快速設定：**
+
+1. **準備 Google Sheets API**：
+   - 在 [Google Cloud Console](https://console.cloud.google.com/) 建立專案
+   - 啟用 Google Sheets API 並建立服務帳戶
+   - 將服務帳戶電子郵件加入試算表共用
+
+2. **部署到 Vercel**：
+   - 前往 [Vercel](https://vercel.com/) 匯入 GitHub repository
+   - 設定環境變數：`GOOGLE_SHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`
+   - 自動部署完成！
+
+3. **自動更新**：
+   - 推送代碼到 `master` 分支即自動部署
+   - Google Sheets 資料即時同步
+
+### 📋 舊版：GitHub Pages 設定步驟
+
+<details>
+<summary>點擊展開 GitHub Pages 部署方法</summary>
 
 ### 第一步：準備 Google Sheets
 
 1. 建立一個新的 Google Sheets 試算表
 2. 將試算表重新命名為「收支明細」或其他合適的名稱
-3. 確保工作表名稱為「工作表1」（或修改程式碼中的工作表名稱）
+3. 確保工作表名稱為「相簿」和「收支明細」
 4. 設定資料結構（參考 PROJECT_DOCUMENTATION.md）
 
 ### 第二步：設定 Google Sheets API
@@ -72,6 +97,8 @@
 3. 輸入函式名稱：`updateWebsite`
 4. 儲存並測試
 
+</details>
+
 ## 🚀 本地開發
 
 1. 複製專案並安裝依賴：
@@ -93,10 +120,12 @@
    npm run dev
    ```
 
-4. 建置靜態網站：
+4. 建置專案：
    ```bash
    npm run build
    ```
+
+**注意**：Vercel 部署時會自動處理建置和部署流程。
 
 ## 📊 資料結構
 
