@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { getTransactions, getFinancialSummary } from '@/lib/sheets';
 
+// Revalidate this page every 5 minutes (300 seconds) 
+// Financial data is more critical, so we want more frequent updates
+export const revalidate = 300;
+
 export default async function FinancesPage() {
   const [transactions, summary] = await Promise.all([
     getTransactions(),

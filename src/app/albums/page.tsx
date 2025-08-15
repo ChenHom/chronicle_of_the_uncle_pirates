@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { getAlbums } from '@/lib/sheets';
 
+// Revalidate this page every 10 minutes (600 seconds)
+// Albums are updated less frequently than financial data
+export const revalidate = 600;
+
 export default async function AlbumsPage() {
   const albums = await getAlbums();
 

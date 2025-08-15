@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { getFinancialSummary, getAlbums } from '@/lib/sheets';
 
+// Revalidate this page every 5 minutes (300 seconds)
+export const revalidate = 300;
+
 export default async function Home() {
   // 取得資料概覽
   const [financialSummary, albums] = await Promise.all([

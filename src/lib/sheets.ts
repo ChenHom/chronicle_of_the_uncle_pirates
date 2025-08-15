@@ -1,6 +1,42 @@
 import { google } from 'googleapis';
 
-// This function is now for testing access, not getting data
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Cache store
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+
+// Cache utility functions
+function getCachedData<T>(key: string): T | null {
+  const cached = cache.get(key);
+  if (!cached) return null;
+  
+  const isExpired = Date.now() - cached.timestamp > CACHE_DURATION;
+  if (isExpired) {
+    cache.delete(key);
+    return null;
+  }
+  
+  return cached.data as T;
+}
+
+function setCachedData<T>(key: string, data: T): void {
+  cache.set(key, {
+    data,
+    timestamp: Date.now()
+  });
+}
+
+function clearCache(key?: string): void {
+  if (key) {
+    cache.delete(key);
+    console.log(`🗑️ Cleared cache for: ${key}`);
+  } else {
+    cache.clear();
+    console.log('🗑️ Cleared all cache');
+  }
+}
+
 // Types for our data structures
 export interface Album {
   AlbumID: string;
@@ -50,6 +86,15 @@ function getGoogleSheetsClient() {
 
 // Get Albums data from the "相簿" worksheet
 export async function getAlbums(): Promise<Album[]> {
+  const cacheKey = 'albums';
+  
+  // Check cache first
+  const cachedAlbums = getCachedData<Album[]>(cacheKey);
+  if (cachedAlbums) {
+    console.log('📦 Using cached albums data');
+    return cachedAlbums;
+  }
+
   try {
     const sheets = getGoogleSheetsClient();
     
@@ -58,6 +103,7 @@ export async function getAlbums(): Promise<Album[]> {
       return [];
     }
     
+    console.log('🔄 Fetching fresh albums data from Google Sheets');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: '相簿!A2:E', // Skip header row, get all data
@@ -65,13 +111,18 @@ export async function getAlbums(): Promise<Album[]> {
 
     const rows = response.data.values || [];
     
-    return rows.map((row): Album => ({
+    const albums = rows.map((row): Album => ({
       AlbumID: row[0] || '',
       Title: row[1] || '',
       Date: row[2] || '',
       Description: row[3] || '',
       AlbumURL: row[4] || '',
     }));
+
+    // Cache the result
+    setCachedData(cacheKey, albums);
+    
+    return albums;
   } catch (error) {
     console.error('Error fetching albums:', error);
     return [];
@@ -80,6 +131,15 @@ export async function getAlbums(): Promise<Album[]> {
 
 // Get Transactions data from the "收支明細" worksheet
 export async function getTransactions(): Promise<Transaction[]> {
+  const cacheKey = 'transactions';
+  
+  // Check cache first
+  const cachedTransactions = getCachedData<Transaction[]>(cacheKey);
+  if (cachedTransactions) {
+    console.log('📦 Using cached transactions data');
+    return cachedTransactions;
+  }
+
   try {
     const sheets = getGoogleSheetsClient();
     
@@ -88,6 +148,7 @@ export async function getTransactions(): Promise<Transaction[]> {
       return [];
     }
     
+    console.log('🔄 Fetching fresh transactions data from Google Sheets');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: '收支明細!A2:I', // Skip header row, get all data - using same sheet for now
@@ -95,7 +156,7 @@ export async function getTransactions(): Promise<Transaction[]> {
 
     const rows = response.data.values || [];
     
-    return rows.map((row): Transaction => ({
+    const transactions = rows.map((row): Transaction => ({
       TransactionID: row[0] || '',
       Date: row[1] || '',
       Source: row[2] || '', // Added Source field
@@ -106,6 +167,11 @@ export async function getTransactions(): Promise<Transaction[]> {
       ReceiptURL: row[7] || undefined,
       Balance: parseFloat(row[8]) || 0,
     }));
+
+    // Cache the result
+    setCachedData(cacheKey, transactions);
+    
+    return transactions;
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return [];
@@ -161,4 +227,19 @@ export async function testSheetAccess() {
     return null;
   }
 }
+
+// Export cache management functions for development/debugging
+export const cacheManager = {
+  clear: clearCache,
+  getCacheSize: () => cache.size,
+  getCacheKeys: () => Array.from(cache.keys()),
+  getCacheInfo: () => {
+    const entries = Array.from(cache.entries()).map(([key, value]) => ({
+      key,
+      age: Math.floor((Date.now() - value.timestamp) / 1000),
+      remainingSeconds: Math.floor((CACHE_DURATION - (Date.now() - value.timestamp)) / 1000)
+    }));
+    return entries;
+  }
+};
 
