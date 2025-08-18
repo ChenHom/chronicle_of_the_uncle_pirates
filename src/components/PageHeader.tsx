@@ -5,7 +5,7 @@ interface PageHeaderProps {
   subtitle?: string;
   icon?: ReactNode;
   children?: ReactNode;
-  gradient?: 'default' | 'albums' | 'finances';
+  gradient?: 'default' | 'albums' | 'finances' | 'management' | 'collection' | 'personal';
   className?: string;
 }
 
@@ -20,7 +20,10 @@ export default function PageHeader({
   const gradientClasses = {
     default: 'from-rose-500/90 to-rose-700/90',
     albums: 'from-purple-500/90 to-rose-600/90',
-    finances: 'from-emerald-500/90 to-rose-600/90'
+    finances: 'from-emerald-500/90 to-rose-600/90',
+    management: 'from-blue-500/90 to-indigo-600/90',
+    collection: 'from-green-500/90 to-emerald-600/90',
+    personal: 'from-purple-500/90 to-pink-600/90'
   };
 
   return (

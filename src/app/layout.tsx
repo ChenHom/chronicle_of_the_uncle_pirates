@@ -4,6 +4,8 @@ import "./globals.css";
 import CacheIndicator from "@/components/CacheIndicator";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AuthProvider from "@/components/auth/AuthProvider";
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +32,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <CacheIndicator />
+        <AuthProvider>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+          <CacheIndicator />
+          <Toaster position="top-right" />
+        </AuthProvider>
       </body>
     </html>
   );

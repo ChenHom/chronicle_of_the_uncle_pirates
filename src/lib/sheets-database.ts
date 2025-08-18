@@ -6,12 +6,8 @@ import type {
 } from '@/types/auth'
 import type { 
   Event, 
-  PaymentRecord, 
-  Transaction 
+  PaymentRecord
 } from '@/types/database'
-
-// 繼承現有的快取系統
-import { cacheManager } from './sheets'
 
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
@@ -266,6 +262,139 @@ export class SheetsDatabase {
       clearCacheByPattern('registered-members')
     } catch (error) {
       console.error('Error updating last login:', error)
+      throw error
+    }
+  }
+
+  async createEvent(eventData: {
+    eventID: string
+    eventName: string
+    eventDate: string
+    eventType: '比賽' | '聚餐' | '其他'
+    requiredAmount: number
+    description?: string
+    participantLineUserIds: string[]
+    createdBy: string
+  }): Promise<void> {
+    try {
+      const sheets = getSheetsClient()
+      if (!sheets) throw new Error('Sheets client not available')
+
+      const now = new Date().toISOString()
+      
+      // 新增活動到活動管理工作表
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: this.spreadsheetId,
+        range: '活動管理!A:L',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[
+            eventData.eventID,
+            eventData.eventName,
+            eventData.eventDate,
+            eventData.eventType,
+            eventData.requiredAmount,
+            eventData.description || '',
+            'planning', // status
+            eventData.createdBy,
+            now, // createdDate
+            now, // updatedDate
+            eventData.participantLineUserIds.length, // participantCount
+            0, // collectedAmount
+          ]]
+        }
+      })
+
+      // 為每個參與者建立收費追蹤記錄
+      const trackingRecords = eventData.participantLineUserIds.map(lineUserId => {
+        const trackingID = `track_${eventData.eventID}_${lineUserId}_${Date.now()}`
+        return [
+          trackingID,
+          eventData.eventID,
+          lineUserId, // memberLineUserID (會需要從 registered members 中找到對應的 realName)
+          '', // memberDisplayName (暫時空白，之後可以填入)
+          eventData.requiredAmount, // requiredAmount
+          0, // paidAmount
+          'unpaid', // paymentStatus
+          '', // paymentDate
+          '', // collectedBy
+          '', // collectorName
+          '', // paymentMethod
+          '', // notes
+          now, // createdDate
+          now, // updatedDate
+        ]
+      })
+
+      if (trackingRecords.length > 0) {
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: this.spreadsheetId,
+          range: '收費追蹤!A:N',
+          valueInputOption: 'RAW',
+          requestBody: {
+            values: trackingRecords
+          }
+        })
+      }
+
+      // 清除相關快取
+      clearCacheByPattern('events')
+      clearCacheByPattern('payment-tracking')
+    } catch (error) {
+      console.error('Error creating event:', error)
+      throw error
+    }
+  }
+
+  async updatePaymentRecord(trackingID: string, updateData: {
+    paidAmount: number
+    paymentStatus: 'unpaid' | 'partial' | 'paid'
+    paymentDate?: string
+    collectedBy?: string
+    collectorName?: string
+    paymentMethod?: string
+    notes?: string
+  }): Promise<void> {
+    try {
+      const sheets = getSheetsClient()
+      if (!sheets) throw new Error('Sheets client not available')
+
+      // 先找到付款記錄的行號
+      const paymentRecords = await this.getPaymentTracking()
+      const recordIndex = paymentRecords.findIndex(p => p.trackingID === trackingID)
+      if (recordIndex === -1) {
+        throw new Error('找不到指定的付款記錄')
+      }
+
+      const rowNumber = recordIndex + 2 // +2 因為有標題行且索引從 0 開始
+      const now = new Date().toISOString()
+      
+      // 更新付款記錄
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: this.spreadsheetId,
+        range: `收費追蹤!E${rowNumber}:N${rowNumber}`, // E 到 N 欄位
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[
+            updateData.paidAmount, // E: paidAmount
+            updateData.paymentStatus, // F: paymentStatus
+            updateData.paymentDate || '', // G: paymentDate
+            updateData.collectedBy || '', // H: collectedBy
+            updateData.collectorName || '', // I: collectorName
+            updateData.paymentMethod || '', // J: paymentMethod
+            updateData.notes || '', // K: notes
+            paymentRecords[recordIndex].createdDate, // L: createdDate (保持原值)
+            now, // M: updatedDate
+            // N: canEdit 欄位保持原值或由其他邏輯決定
+          ]]
+        }
+      })
+
+      // 清除相關快取
+      clearCacheByPattern('payment-tracking')
+      clearCacheByPattern('events') // 因為事件統計會受影響
+    } catch (error) {
+      console.error('Error updating payment record:', error)
       throw error
     }
   }

@@ -102,10 +102,16 @@ src/
 
 ## 📚 重要文件參考
 
+### 原有專案文件
 - **[README.md](./README.md)**: 完整的專案說明和部署指南
 - **[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)**: Vercel 部署詳細步驟
 - **[CACHE_STRATEGY.md](./CACHE_STRATEGY.md)**: 快取策略詳細說明
 - **[PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md)**: 技術架構和資料結構
+
+### 收費管理系統文件
+- **[PAYMENT_SYSTEM_DESIGN.md](./PAYMENT_SYSTEM_DESIGN.md)**: 收費系統架構設計
+- **[PAYMENT_SYSTEM_STATUS.md](./PAYMENT_SYSTEM_STATUS.md)**: 系統實作狀態報告
+- **[.env.local.example](./.env.local.example)**: 環境變數設定範例
 
 ## 🔄 專案歷史重點
 
@@ -114,11 +120,20 @@ src/
 - **API 問題解決**: 修正 Google Sheets JWT 認證問題
 - **效能優化**: 實作雙層快取策略，大幅提升效能
 - **自動部署**: 建立完整的 CI/CD 流程
+- **收費管理系統**: 完整的 LINE Login + 收費管理功能 (2025-08-18 新增)
+
+### 最新功能 🆕 (2025-08-18)
+- **LINE Login 認證**: NextAuth.js 整合，支援三級權限控制
+- **管理員介面**: 活動建立、成員管理、系統統計
+- **收費操作**: 即時收費狀態更新、批次操作支援
+- **個人中心**: 個人繳費記錄查看、統計資料
+- **API 系統**: 完整的 RESTful API + 權限檢查
 
 ### 技術債務狀態
 ✅ 所有已知技術債務已清理完畢  
 ✅ 程式碼品質良好  
 ✅ 文件更新完整  
+✅ 收費管理系統整合完成  
 
 ## 💡 最佳實踐
 
@@ -130,6 +145,7 @@ src/
 
 ---
 
-**最後更新**: 2025年8月17日  
-**專案狀態**: 穩定運行，功能完整  
-**維護狀態**: 持續監控，按需優化
+**最後更新**: 2025年8月18日  
+**專案狀態**: 穩定運行，功能完整，收費管理系統已整合  
+**維護狀態**: 持續監控，按需優化  
+**新功能**: LINE Login 認證 + 完整收費管理功能

@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+import LoginButton from '@/components/auth/LoginButton';
 
 interface NavLinkProps {
   href: string;
@@ -27,13 +29,22 @@ function NavLink({ href, children, isActive }: NavLinkProps) {
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navItems = [
+  const publicNavItems = [
     { href: '/', label: '首頁', icon: '🏠' },
     { href: '/albums', label: '活動相簿', icon: '📸' },
     { href: '/finances', label: '公積金', icon: '💰' }
   ];
+
+  const managementNavItems = [
+    { href: '/management', label: '管理中心', icon: '⚙️' },
+    { href: '/collection', label: '收費管理', icon: '💳' },
+    { href: '/my', label: '個人中心', icon: '👤' }
+  ];
+
+  const navItems = session ? [...publicNavItems, ...managementNavItems] : publicNavItems;
 
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-rose-100 sticky top-0 z-40">
@@ -59,6 +70,9 @@ export default function Navigation() {
                 {item.label}
               </NavLink>
             ))}
+            <div className="ml-4 pl-4 border-l border-rose-200">
+              <LoginButton />
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,7 +97,7 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         <div className={`md:hidden transition-all duration-300 overflow-hidden ${
-          isMobileMenuOpen ? 'max-h-48 pb-4' : 'max-h-0'
+          isMobileMenuOpen ? 'max-h-64 pb-4' : 'max-h-0'
         }`}>
           <div className="flex flex-col space-y-2 pt-4">
             {navItems.map((item) => (
@@ -96,6 +110,9 @@ export default function Navigation() {
                 {item.label}
               </NavLink>
             ))}
+            <div className="pt-4 border-t border-rose-100">
+              <LoginButton />
+            </div>
           </div>
         </div>
       </div>
