@@ -13,20 +13,27 @@
 
 ## 🛠 技術架構
 
-- **前端框架**: Next.js 15 (React 19)
-- **樣式框架**: Tailwind CSS
+- **前端框架**: Next.js 15 (React 19) + TypeScript
+- **樣式框架**: Tailwind CSS v4
 - **部署平台**: Vercel (支援 SSR)
+- **快取策略**: 雙層快取 (內存 + ISR)
 - **資料來源**: Google Sheets
-- **API 整合**: Google Sheets API
+- **API 整合**: Google Sheets API (已優化認證)
 - **自動部署**: Git Push 觸發自動部署
 
 ## 🚀 快速部署指南
 
-### 🆕 推薦：Vercel 部署 (SSR + 即時資料)
+### ⭐ 主要部署方式：Vercel (已遷移完成)
+
+**本專案已成功遷移到 Vercel，享受以下優勢：**
+- 🚀 Server-Side Rendering (SSR) 支援
+- ⚡ 多層快取策略，大幅提升效能
+- 🔄 自動部署，推送即上線
+- 📊 即時 Google Sheets 資料同步
 
 詳細步驟請參考：[VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
 
-**快速設定：**
+**🎯 三步驟快速部署：**
 
 1. **準備 Google Sheets API**：
    - 在 [Google Cloud Console](https://console.cloud.google.com/) 建立專案
@@ -36,13 +43,16 @@
 2. **部署到 Vercel**：
    - 前往 [Vercel](https://vercel.com/) 匯入 GitHub repository
    - 設定環境變數：`GOOGLE_SHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`
-   - 自動部署完成！
+   - 自動部署完成！✨
 
-3. **自動更新**：
+3. **享受自動化**：
    - 推送代碼到 `master` 分支即自動部署
-   - Google Sheets 資料即時同步
+   - Google Sheets 資料透過快取策略即時同步
+   - 支援 Preview 部署進行功能測試
 
-### 📋 舊版：GitHub Pages 設定步驟
+---
+
+### 📋 備用選項：GitHub Pages 設定步驟
 
 <details>
 <summary>點擊展開 GitHub Pages 部署方法</summary>
@@ -125,7 +135,10 @@
    npm run build
    ```
 
-**注意**：Vercel 部署時會自動處理建置和部署流程。
+**注意**：
+- Vercel 部署時會自動處理建置和部署流程
+- 享受雙層快取策略帶來的卓越效能
+- 支援即時資料更新，無需手動觸發部署
 
 ## 📊 資料結構
 

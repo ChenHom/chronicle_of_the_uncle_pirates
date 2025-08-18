@@ -1,5 +1,7 @@
-import Link from 'next/link';
 import { getTransactions, getFinancialSummary } from '@/lib/sheets';
+import Card, { CardContent, StatsCard } from '@/components/Card';
+import Button from '@/components/Button';
+import PageHeader from '@/components/PageHeader';
 
 // Revalidate this page every 5 minutes (300 seconds) 
 // Financial data is more critical, so we want more frequent updates
@@ -16,58 +18,42 @@ export default async function FinancesPage() {
     new Date(b.Date).getTime() - new Date(a.Date).getTime()
   );
 
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 to-rose-50">
+    <div className="bg-gradient-to-br from-rose-100 to-rose-50">
       {/* 頁面標題 */}
-      <section className="relative bg-gradient-to-r from-rose-500/90 to-rose-700/90 text-white">
-        <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
-        <div className="container mx-auto px-6 py-16">
-          <div className="max-w-6xl mx-auto">
-            <Link href="/" className="relative z-10 inline-flex items-center text-rose-200 hover:text-white mb-6 transition-colors">
-              ← 返回首頁
-            </Link>
-            <h1 className="relative z-10 text-4xl md:text-5xl font-bold mb-4">公積金明細</h1>
-            <p className="relative z-10 text-xl opacity-90">
-              透明公開的財務管理，每一筆收支都清楚記錄
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        title="公積金明細"
+        subtitle="透明公開的財務管理，每一筆收支都清楚記錄"
+        icon="💰"
+        gradient="finances"
+      >
+        <Button href="/" variant="secondary">
+          ← 返回首頁
+        </Button>
+      </PageHeader>
 
       {/* 財務總覽 */}
       <section className="container mx-auto px-6 py-16">
         <div className="max-w-6xl mx-auto mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">財務總覽</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* 目前結餘 */}
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md p-8 text-center">
-              <div className="text-4xl mb-4">💰</div>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">目前結餘</h3>
-              <p className={`text-4xl font-bold ${
-                summary.currentBalance >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                NT$ {summary.currentBalance.toLocaleString()}
-              </p>
-            </div>
-
-            {/* 總收入 */}
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md p-8 text-center">
-              <div className="text-4xl mb-4">📈</div>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">總收入</h3>
-              <p className="text-4xl font-bold text-green-600">
-                NT$ {summary.totalIncome.toLocaleString()}
-              </p>
-            </div>
-
-            {/* 總支出 */}
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md p-8 text-center">
-              <div className="text-4xl mb-4">📉</div>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">總支出</h3>
-              <p className="text-4xl font-bold text-red-600">
-                NT$ {summary.totalExpense.toLocaleString()}
-              </p>
-            </div>
+            <StatsCard
+              title="目前結餘"
+              value={`NT$ ${summary.currentBalance.toLocaleString()}`}
+              icon="💰"
+              className={summary.currentBalance >= 0 ? '' : 'border-red-200'}
+            />
+            <StatsCard
+              title="總收入"
+              value={`NT$ ${summary.totalIncome.toLocaleString()}`}
+              icon="📈"
+            />
+            <StatsCard
+              title="總支出"
+              value={`NT$ ${summary.totalExpense.toLocaleString()}`}
+              icon="📉"
+            />
           </div>
         </div>
 
@@ -76,46 +62,25 @@ export default async function FinancesPage() {
           <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">收支明細</h2>
           
           {transactions.length === 0 ? (
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md p-12 text-center">
+            <Card className="text-center py-12">
               <div className="text-6xl opacity-20 mb-6">📊</div>
               <h3 className="text-2xl font-bold text-slate-700 mb-4">暫無交易記錄</h3>
-              <p className="text-slate-600">
-                目前還沒有任何收支記錄
-              </p>
-            </div>
+              <p className="text-slate-600">目前還沒有任何收支記錄</p>
+            </Card>
           ) : (
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl shadow-md overflow-hidden">
-              {/* 表格標題（桌面版） */}
-              <div className="hidden md:block bg-gray-50 px-6 py-4 border-b">
-                <div className="grid grid-cols-8 gap-4 font-semibold text-gray-700">
-                  <div>日期</div>
-                  <div>來源</div>
-                  <div>項目說明</div>
-                  <div>類型</div>
-                  <div>金額</div>
-                  <div>經手人</div>
-                  <div>結餘</div>
-                  <div>收據</div>
-                </div>
-              </div>
-
-              {/* 交易記錄 */}
-              <div className="divide-y divide-gray-100">
-                {sortedTransactions.map((transaction, index) => (
-                  <div key={transaction.TransactionID || `transaction-${index}`} className="p-6 hover:bg-gray-50 transition-colors">
-                    
+            <div className="space-y-4">
+              {sortedTransactions.map((transaction, index) => (
+                <Card key={transaction.TransactionID || `transaction-${index}`} hover>
+                  <CardContent className="py-4">
                     {/* 桌面版佈局 */}
-                    <div className="hidden md:grid grid-cols-8 gap-4 items-center">
-                      <div className="text-gray-600">
+                    <div className="hidden md:grid md:grid-cols-7 gap-4 items-center">
+                      <div className="text-slate-600">
                         {new Date(transaction.Date).toLocaleDateString('zh-TW')}
                       </div>
-                      <div className="text-gray-600">
-                        {transaction.Source}
-                      </div>
-                      <div className="font-medium text-gray-800">
+                      <div className="font-medium text-slate-800 col-span-2">
                         {transaction.Description}
                       </div>
-                      <div>
+                      <div className="flex justify-center">
                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                           transaction.Type === '收入' 
                             ? 'bg-green-100 text-green-700'
@@ -124,42 +89,37 @@ export default async function FinancesPage() {
                           {transaction.Type}
                         </span>
                       </div>
-                      <div className={`font-bold ${
+                      <div className={`font-bold text-right ${
                         transaction.Type === '收入' ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {transaction.Type === '收入' ? '+' : '-'}NT$ {transaction.Amount.toLocaleString()}
                       </div>
-                      <div className="text-gray-600">
+                      <div className="text-slate-600 text-center">
                         {transaction.Handler}
                       </div>
-                      <div className={`font-semibold ${
-                        transaction.Balance >= 0 ? 'text-gray-800' : 'text-red-600'
-                      }`}>
-                        NT$ {transaction.Balance.toLocaleString()}
-                      </div>
-                      <div>
+                      <div className="flex justify-end">
                         {transaction.ReceiptURL ? (
                           <a 
                             href={transaction.ReceiptURL} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 text-sm"
+                            className="text-blue-600 hover:text-blue-700 font-medium"
                           >
                             查看收據
                           </a>
                         ) : (
-                          <span className="text-gray-400 text-sm">無</span>
+                          <span className="text-slate-400">無</span>
                         )}
                       </div>
                     </div>
 
-                    {/* 手機版佈局 */}
+                    {/* 移動版佈局 */}
                     <div className="md:hidden">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h4 className="font-medium text-gray-800">{transaction.Description}</h4>
-                          <p className="text-sm text-gray-500">
-                            {new Date(transaction.Date).toLocaleDateString('zh-TW')} · {transaction.Source} · {transaction.Handler}
+                          <h4 className="font-medium text-slate-800">{transaction.Description}</h4>
+                          <p className="text-sm text-slate-500">
+                            {new Date(transaction.Date).toLocaleDateString('zh-TW')} · {transaction.Handler}
                           </p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -177,30 +137,30 @@ export default async function FinancesPage() {
                           {transaction.Type === '收入' ? '+' : '-'}NT$ {transaction.Amount.toLocaleString()}
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-gray-500">結餘</div>
+                          <div className="text-sm text-slate-500">結餘</div>
                           <div className={`font-semibold ${
-                            transaction.Balance >= 0 ? 'text-gray-800' : 'text-red-600'
+                            transaction.Balance >= 0 ? 'text-slate-800' : 'text-red-600'
                           }`}>
                             NT$ {transaction.Balance.toLocaleString()}
                           </div>
                         </div>
                       </div>
                       {transaction.ReceiptURL && (
-                        <div className="mt-2">
+                        <div className="mt-3 pt-3 border-t border-rose-100">
                           <a 
                             href={transaction.ReceiptURL} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-700 text-sm"
+                            className="text-blue-600 hover:text-blue-700 font-medium"
                           >
                             查看收據 →
                           </a>
                         </div>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </div>
@@ -213,30 +173,28 @@ export default async function FinancesPage() {
             <div className="max-w-4xl mx-auto">
               <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">統計資訊</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="bg-rose-50 border border-rose-100 rounded-xl p-6 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-amber-600">{summary.transactionCount}</div>
-                  <div className="text-slate-700 text-sm">總筆數</div>
-                </div>
-                <div className="bg-rose-50 border border-rose-100 rounded-xl p-6 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-green-600">
-                    {transactions.filter(t => t.Type === '收入').length}
-                  </div>
-                  <div className="text-slate-700 text-sm">收入筆數</div>
-                </div>
-                <div className="bg-rose-50 border border-rose-100 rounded-xl p-6 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-red-600">
-                    {transactions.filter(t => t.Type === '支出').length}
-                  </div>
-                  <div className="text-slate-700 text-sm">支出筆數</div>
-                </div>
-                <div className="bg-rose-50 border border-rose-100 rounded-xl p-6 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {summary.totalIncome > 0 
-                      ? Math.round((summary.totalExpense / summary.totalIncome) * 100) 
-                      : 0}%
-                  </div>
-                  <div className="text-slate-700 text-sm">支出比例</div>
-                </div>
+                <StatsCard
+                  title="總筆數"
+                  value={summary.transactionCount}
+                  icon="📊"
+                />
+                <StatsCard
+                  title="收入筆數"
+                  value={transactions.filter(t => t.Type === '收入').length}
+                  icon="📈"
+                />
+                <StatsCard
+                  title="支出筆數"
+                  value={transactions.filter(t => t.Type === '支出').length}
+                  icon="📉"
+                />
+                <StatsCard
+                  title="支出比例"
+                  value={`${summary.totalIncome > 0 
+                    ? Math.round((summary.totalExpense / summary.totalIncome) * 100) 
+                    : 0}%`}
+                  icon="📊"
+                />
               </div>
             </div>
           </div>
