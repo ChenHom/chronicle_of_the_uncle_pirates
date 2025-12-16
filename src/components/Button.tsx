@@ -27,7 +27,7 @@ const getVariantClasses = (variant: ButtonVariant) => {
   const variants = {
     primary: 'bg-rose-500 text-white hover:bg-rose-600 focus:ring-rose-500 shadow-md hover:shadow-lg',
     secondary: 'bg-rose-100 text-rose-700 hover:bg-rose-200 focus:ring-rose-300',
-    outline: 'border-2 border-rose-500 text-rose-600 hover:bg-rose-50 focus:ring-rose-300',
+    outline: 'border-2 border-rose-700 text-rose-700 font-semibold hover:bg-white focus:ring-rose-300 shadow-sm',
     ghost: 'text-rose-600 hover:bg-rose-50 focus:ring-rose-300',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 shadow-md hover:shadow-lg'
   };
@@ -66,12 +66,12 @@ export default function Button({
 
   if (href) {
     return (
-      <Link 
+      <Link
         href={href}
         className={classes}
-        {...(disabled && { 
+        {...(disabled && {
           onClick: (e) => e.preventDefault(),
-          'aria-disabled': true 
+          'aria-disabled': true
         })}
       >
         {children}
@@ -80,7 +80,7 @@ export default function Button({
   }
 
   return (
-    <button 
+    <button
       className={classes}
       disabled={disabled}
       {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
@@ -96,16 +96,16 @@ interface IconButtonProps extends Omit<ButtonProps, 'children'> {
   'aria-label': string;
 }
 
-export function IconButton({ 
-  icon, 
-  variant = 'ghost', 
-  size = 'md', 
+export function IconButton({
+  icon,
+  variant = 'ghost',
+  size = 'md',
   className = '',
-  ...props 
+  ...props
 }: IconButtonProps) {
   const iconSizes = {
     sm: 'w-8 h-8',
-    md: 'w-10 h-10', 
+    md: 'w-10 h-10',
     lg: 'w-12 h-12'
   };
 

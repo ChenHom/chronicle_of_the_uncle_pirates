@@ -36,11 +36,11 @@ export default async function Home() {
       {/* 快速概覽區塊 */}
       <section className="container mx-auto px-6 py-16">
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          
+
           {/* 活動相簿卡片 */}
           <Card href="/albums" hover className="h-80 flex flex-col">
-            <CardHeader 
-              title="活動相簿" 
+            <CardHeader
+              title="活動相簿"
               subtitle="回顧我們的精彩時光"
               icon="📸"
               gradient="albums"
@@ -63,8 +63,8 @@ export default async function Home() {
 
           {/* 公積金總覽卡片 */}
           <Card href="/finances" hover className="h-80 flex flex-col">
-            <CardHeader 
-              title="公積金總覽" 
+            <CardHeader
+              title="公積金總覽"
               subtitle="透明的財務管理"
               icon="💰"
               gradient="finances"
